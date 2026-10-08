@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Anything you may synthesize</title>
+    <meta name="description" content="Personal presentation page by Michshell.">
+    <link rel="icon" href="static/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/">Anything you may synthesize</a>
+        <nav class="top-links" aria-label="External links">
+          <a href="https://csdn.michshell.net" target="_blank" rel="noopener noreferrer">Blog</a>
+          <a href="https://github.com/Michshelle" target="_blank" rel="noopener noreferrer">Repo</a>
+        </nav>
+      </header>
+
+      <main class="page-content" aria-label="Main content">
+        <section class="hero">
+          <p class="kicker">Micro Exhibition</p>
+          <h1>Welcome to the Tiny Museum of Chaotic Ideas</h1>
+          <p class="lead">
+            This room rotates one totally unnecessary but delightful artifact every time you click the button.
+            Zero productivity guaranteed.
+          </p>
+
+          <div class="artifact-card" id="artifact-card" role="status" aria-live="polite">
+            <div class="artifact-emoji" id="artifact-emoji">🦆</div>
+            <h2 id="artifact-title">Duck of Unexpected Confidence</h2>
+            <p id="artifact-text">Believes every bug is actually a feature preview and struts accordingly.</p>
+          </div>
+
+          <button class="artifact-button" id="artifact-button" type="button">Show random artifact</button>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-wrap">
+          <span class="footer-title">Useful links:</span>
+          <a class="footer-link" href="https://bunbunbee.top" target="_blank" rel="noopener noreferrer">Manuals</a>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        var badgePool = ['🦆', '🛰️', '🍜', '🛸', '🎈', '😺', '🍌', '👻'];
+        var moodPool = ['Confident', 'Sleepy', 'Hyperactive', 'Overengineered', 'Portable', 'Legendary', 'Quantum', 'Coffee-Powered'];
+        var nounPool = ['Duck', 'Compiler', 'Spaceship', 'Sandwich', 'Keyboard', 'Algorithm', 'Toaster', 'Backlog'];
+        var verbPool = ['teaches', 'accidentally deploys', 'refactors', 'speedruns', 'debugs', 'remixes', 'compresses', 'outsmarts'];
+        var objectPool = ['a stubborn bug', 'a 400-line TODO list', 'an outdated roadmap', 'a mystery warning', 'your weekend plan', 'a wild merge conflict', 'an impossible deadline', 'a haunted config file'];
+        var placePool = ['in low Earth orbit', 'inside a virtual coffee shop', 'under neon rain', 'in a silent meeting room', 'on a floating sticky note', 'at the edge of version control history', 'in the thermal zone of your laptop', 'near the bug triage arena'];
+        var endingPool = ['and nobody asks follow-up questions.', 'while a rubber duck nods approvingly.', 'before lunch and without documentation.', 'as if this was always the architecture.', 'then celebrates with dramatic spreadsheet music.', 'and leaves behind one cryptic comment.', 'while pretending this is totally normal.', 'without breaking a single semicolon.'];
+        var recentKeys = [];
+        var RECENT_LIMIT = 18;
+
+        var button = document.getElementById('artifact-button');
+        var emoji = document.getElementById('artifact-emoji');
+        var title = document.getElementById('artifact-title');
+        var text = document.getElementById('artifact-text');
+        var card = document.getElementById('artifact-card');
+        function randomInt(max) {
+          if (window.crypto && window.crypto.getRandomValues) {
+            var arr = new Uint32Array(1);
+            window.crypto.getRandomValues(arr);
+            return arr[0] % max;
+          }
+          return Math.floor(Math.random() * max);
+        }
+
+        function choose(pool) {
+          return pool[randomInt(pool.length)];
+        }
+
+        function uniqueKey(parts) {
+          return parts.join('|');
+        }
+
+        function makeArtifact() {
+          var attempts = 0;
+          while (attempts < 24) {
+            var badge = choose(badgePool);
+            var mood = choose(moodPool);
+            var noun = choose(nounPool);
+            var verb = choose(verbPool);
+            var obj = choose(objectPool);
+            var place = choose(placePool);
+            var ending = choose(endingPool);
+            var nonce = randomInt(1000000);
+            var key = uniqueKey([badge, mood, noun, verb, obj, place, ending, String(nonce)]);
+
+            if (recentKeys.indexOf(key) === -1) {
+              recentKeys.push(key);
+              if (recentKeys.length > RECENT_LIMIT) {
+                recentKeys.shift();
+              }
+              return {
+                emoji: badge,
+                title: noun + ' of ' + mood + ' Chaos',
+                text: 'Today\'s discovery #' + nonce + ': The ' + noun.toLowerCase() + ' ' + verb + ' ' + obj + ' ' + place + ', ' + ending
+              };
+            }
+            attempts += 1;
+          }
+
+          return {
+            emoji: '[CHAOS]',
+            title: 'Infinite Generator Fallback',
+            text: 'The meme machine is too creative to repeat itself today.'
+          };
+        }
+
+        function render(item) {
+          emoji.textContent = item.emoji;
+          title.textContent = item.title;
+          text.textContent = item.text;
+          card.classList.remove('pulse');
+          void card.offsetWidth;
+          card.classList.add('pulse');
+        }
+
+        if (!button || !emoji || !title || !text || !card) {
+          return;
+        }
+
+        render(makeArtifact());
+
+        button.addEventListener('click', function () {
+          render(makeArtifact());
+        });
+      })();
+    </script>
+  </body>
+</html>

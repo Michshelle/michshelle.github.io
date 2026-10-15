@@ -66,12 +66,22 @@ body {
   transition: color 150ms ease;
 }
 
+.top-links a:visited {
+  color: var(--muted);
+}
+
 .top-links a:hover,
 .top-links a:focus-visible,
+.top-links a:visited:hover,
+.top-links a:visited:focus-visible,
 .footer-link:hover,
 .footer-link:focus-visible,
 .brand:hover,
 .brand:focus-visible {
+  color: var(--highlight);
+}
+
+.top-links a:active {
   color: var(--highlight);
 }
 
